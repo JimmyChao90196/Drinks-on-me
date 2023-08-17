@@ -10,7 +10,10 @@ import UIKit
 class DetailTableViewController: UITableViewController {
 
     
+    @IBOutlet var notes: UITextField!
+    @IBOutlet var clientName: UITextField!
     var drinkInfo:SearchRecords.Drinks?
+    var orderInfo = OrderInfo(sweetness: "", ice: "", toppings: "")
     
     //Define sections
     struct Section {
@@ -22,38 +25,92 @@ class DetailTableViewController: UITableViewController {
     }
 
 
+    //Option sections
     var sections: [Section] = [
         Section(headerTitle: nil, rows: ["Big Image with Label Title"], backgroundColor: .white),
         Section(headerTitle: "甜度", rows: ["正常糖", "少糖","半糖", "微糖","無糖"], backgroundColor: .init(red: 0.8, green: 0.75, blue: 0.4, alpha: 0.95)),
-        
-        Section(headerTitle: "冰塊", rows: ["正常冰", "少冰","微冰","去冰", "完全去冰","常溫","溫", "熱"], backgroundColor: .init(red: 0.8, green: 0.75, blue: 0.4, alpha: 0.95))
-        // Add more sections as needed
+        Section(headerTitle: "冰塊", rows: ["正常冰", "少冰","微冰","去冰", "完全去冰","常溫","溫", "熱"], backgroundColor: .init(red: 0.8, green: 0.75, blue: 0.4, alpha: 0.95)),
+        Section(headerTitle: "配料", rows: ["水玉", "白玉珍珠"], backgroundColor: .init(red: 0.8, green: 0.75, blue: 0.4, alpha: 0.95)),
+  
     ]
 
     
+    
+    
+    
 
-    
-    
-    
     
     
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        
-        //tableView.register(UITableViewCell.self, forCellReuseIdentifier: "CellIdentifier")
-
-        
-        // Uncomment the following line to preserve selection between presentations
-        // self.clearsSelectionOnViewWillAppear = false
-
-        // Uncomment the following line to display an Edit button in the navigation bar for this view controller.
-        // self.navigationItem.rightBarButtonItem = self.editButtonItem
     }
     
+    // MARK: - Add to cart
+    
+    @IBAction func addToCart(_ sender: Any) {
+        postRequest()
+    }
+    
+    
+    
+    
+    //Post request
+    func postRequest(){
+        
+        let urlStr = "https://api.airtable.com/v0/appN21f5f7mgnzUIi/order"
+        if let url = URL(string: urlStr){
+            var urlRequest = URLRequest(url: url )
+            urlRequest.httpMethod = "POST"
+            urlRequest.setValue("Bearer patVvuJLhCGDlIA5N.bb43e3d5bf2d60015a897eff3ed89c044143a0c5fc967a59bcb9d20d8cc5043a", forHTTPHeaderField: "Authorization")
+            urlRequest.setValue("application/json", forHTTPHeaderField: "Content-Type")
+            urlRequest.setValue("application/json", forHTTPHeaderField: "Accept")
+            
+            
+            //Extract and post drink info
+            guard let drinkInfo else{ return }
 
-    
-    
+            var orderFields = PostFields(
+                orderedDrinkName: drinkInfo.fields.name,
+                sweetness: orderInfo.sweetness,
+                ice: orderInfo.ice,
+                clientName: clientName.text ?? "Defualt client 404",
+                notes: notes.text ?? "none",
+                toppings: "水玉",
+                price: 10
+            )
+
+            let orderRecord = PostRecords(fields: orderFields)
+            var orderData = PostRoot(records: [orderRecord])
+            
+            
+            var encoder = JSONEncoder()
+            var decoder = JSONDecoder()
+            
+            urlRequest.httpBody = try? encoder.encode(orderData)
+           
+
+            
+            URLSession.shared.dataTask(with: urlRequest) { data, _, _ in
+                if let data{
+                    
+                    print(String(data: data, encoding: .utf8) ?? "Invalid data")
+                    
+                    let decoder = JSONDecoder()
+                    decoder.dateDecodingStrategy = .iso8601
+                    
+                    
+                    do {
+                        let postResponse =  try decoder.decode(PostResponse.self, from: data)
+                      
+                        print("Token: \(postResponse)")
+                    } catch  {
+                        print(error)
+                    }
+                }
+            }.resume()
+        }
+    }
     
     
     
@@ -114,6 +171,8 @@ class DetailTableViewController: UITableViewController {
 
     
     
+    
+    
     // MARK: - Table view rows and sections
 
     override func numberOfSections(in tableView: UITableView) -> Int {
@@ -124,6 +183,10 @@ class DetailTableViewController: UITableViewController {
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return sections[section].isCollapsed ? 0 : sections[section].rows.count
     }
+    
+    
+    
+    
 
 
     
@@ -152,13 +215,30 @@ class DetailTableViewController: UITableViewController {
     // MARK: - Tapped action
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        
         if indexPath.section > 0 {
             // Update the selected row index for the section
             sections[indexPath.section].selectedRowIndex = indexPath.row
             
+            
+            //Extract order info
+            switch indexPath.section {
+            case 1: orderInfo.sweetness = sections[1].rows[indexPath.row]
+                print(orderInfo.sweetness)
+            case 2: orderInfo.ice = sections[2].rows[indexPath.row]
+                print(orderInfo.ice)
+            case 3: orderInfo.toppings = sections[3].rows[indexPath.row]
+                print(orderInfo.toppings)
+            default: return
+            }
+
+            
+            
             // Get all rows within the section to be reloaded
             let rowsInRange = 0..<sections[indexPath.section].rows.count
             let indexPathsToReload = rowsInRange.map { IndexPath(row: $0, section: indexPath.section) }
+            
+            
             
             // Reload the rows without affecting the header
             UIView.performWithoutAnimation {
@@ -177,8 +257,7 @@ class DetailTableViewController: UITableViewController {
         return sections[section].headerTitle
     }
     
-    
-    
+
     override func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
         let headerView = UIView()
         headerView.backgroundColor = sections[section].backgroundColor
