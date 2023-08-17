@@ -37,7 +37,7 @@ class MenuTableViewController: UITableViewController {
         let urlStr = "https://api.airtable.com/v0/appN21f5f7mgnzUIi/menu?sort%5B0%5D%5Bfield%5D=\(sortField)&sort%5B0%5D%5Bdirection%5D=\(sortDirection)"
         
         if let url = URL(string: urlStr){
-            var urlRequest = URLRequest(url: url, cachePolicy: .returnCacheDataElseLoad)
+            var urlRequest = URLRequest(url: url, cachePolicy: .reloadIgnoringLocalCacheData)
             urlRequest.httpMethod = "GET"
             urlRequest.setValue("Bearer patVvuJLhCGDlIA5N.bb43e3d5bf2d60015a897eff3ed89c044143a0c5fc967a59bcb9d20d8cc5043a", forHTTPHeaderField: "Authorization")
             
