@@ -18,8 +18,8 @@ import OSLog
 class MenuTableViewController: UITableViewController {
     
     let logger = Logger()
-    var resultRecords:SearchRecords?
-    var tappedDrinks:SearchRecords.Drinks?
+    var resultRecords:SearchRoot?
+    var tappedDrinks:SearchRoot.Drinks?
 
     
     override func viewDidLoad() {
@@ -47,7 +47,7 @@ class MenuTableViewController: UITableViewController {
                     //decoder.dateDecodingStrategy = .iso8601
                     
                     do {
-                        let searchRecords = try decoder.decode(SearchRecords.self, from: data)
+                        let searchRecords = try decoder.decode(SearchRoot.self, from: data)
                         
                         DispatchQueue.main.async {
                             self.resultRecords = searchRecords

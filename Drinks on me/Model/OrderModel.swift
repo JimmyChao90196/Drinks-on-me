@@ -26,6 +26,7 @@ struct PostFields: Codable {
     var notes: String
     var toppings: String
     var price: Int
+    var size:String
 }
 
 
@@ -33,7 +34,7 @@ struct PostFields: Codable {
 
 
 
-struct PostResponse: Codable {
+struct ResponseRoot: Codable {
     var records: [ResponseRecords]
 }
 
@@ -56,8 +57,23 @@ struct ResponseFields: Codable {
 
 
 
+
+
+// MARK: - Do not use this struct as decoding struct type
+
 struct OrderInfo{
     var sweetness:String
     var ice:String
     var toppings:String
+    var sizeDescription:String
+    var price:Int
+    var size:String {
+        
+        switch sizeDescription{
+        case "中杯" : return "medium"
+        case "大杯" : return "big"
+        default : return "medium"
+        }
+    }
+    
 }

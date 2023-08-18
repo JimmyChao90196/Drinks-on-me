@@ -9,7 +9,18 @@ import Foundation
 import UIKit
 
 
-struct SearchRecords:Codable{
+
+
+
+
+
+
+
+
+
+// MARK: - Decoding and encoding structure
+
+struct SearchRoot:Codable{
     
     let records:[Drinks]
         

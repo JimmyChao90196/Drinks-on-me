@@ -9,21 +9,19 @@ import UIKit
 
 class DetailTableViewCell: UITableViewCell {
 
+    
+    
+    // MARK: - Prepare for reuse
 
-    @IBOutlet var minPrice: UILabel!
-    @IBOutlet var drinkDescription: UITextView!
-    @IBOutlet var drinkName: UILabel!
-    @IBOutlet var drinkImage: UIImageView!
-    
-    
-    
-    
     
     override func awakeFromNib() {
         super.awakeFromNib()
+        
+
         // Initialization code
-        
-        
+        self.textLabel?.text = nil
+        self.imageView?.image = nil
+        self.backgroundColor = .white
         
     }
 
