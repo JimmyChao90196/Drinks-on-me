@@ -53,7 +53,6 @@ func fetchOrder(_ completion: @escaping ((_ fetchedOrderRoot:ResponseRoot) -> Vo
         urlRequest.httpMethod = "GET"
         urlRequest.setValue("Bearer patVvuJLhCGDlIA5N.bb43e3d5bf2d60015a897eff3ed89c044143a0c5fc967a59bcb9d20d8cc5043a", forHTTPHeaderField: "Authorization")
         
-
         URLSession.shared.dataTask(with: urlRequest) { data, _, _ in
             if let data{
                 let decoder = JSONDecoder()

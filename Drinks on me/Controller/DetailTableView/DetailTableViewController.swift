@@ -7,15 +7,22 @@
 
 import UIKit
 
-class DetailTableViewController: UITableViewController {
+class DetailTableViewController: UITableViewController,UITextFieldDelegate {
 
     
+    @IBOutlet var stepperView: UIStepper!
+    @IBOutlet var footerView: UIView!
+    @IBOutlet var headerDescription: UITextView!
+    @IBOutlet var addToCart: UIButton!
+    @IBOutlet var headerView: UIView!
     @IBOutlet var headerImage: UIImageView!
     @IBOutlet var notes: UITextField!
     @IBOutlet var clientName: UITextField!
+
+    var originPrice = 0
     var drinkInfo:SearchRoot.Drinks?
     
-    var orderInfo = OrderInfo(sweetness: "", ice: "", toppings: "", sizeDescription: "", price: 10)
+    var orderInfo = OrderInfo(sweetness: "", ice: "", toppings: "", price: 0, cups: 1, size: "")
     
 
     // MARK: - Section defination for menu
@@ -39,59 +46,148 @@ class DetailTableViewController: UITableViewController {
         
         Section(headerTitle: "配料", rows: ["水玉", "白玉珍珠"], backgroundColor: .init(red: 0.8, green: 0.75, blue: 0.4, alpha: 0.95)),
         
-        Section(headerTitle: "Size", rows: ["中杯", "大杯"], backgroundColor: .init(red: 0.8, green: 0.75, blue: 0.4, alpha: 0.95))
+        Section(headerTitle: "Size", rows: ["中杯:", "大杯:"], backgroundColor: .init(red: 0.8, green: 0.75, blue: 0.4, alpha: 0.95))
     ]
+    
+    
+    //Adjust section initializer
+    func sectionInitializer(){
+        sections[3].rows[0] += "    $ \(drinkInfo?.fields.medium ?? 0)"
+        sections[3].rows[1] += "    $ \(drinkInfo?.fields.big ?? 0)"
+    }
     
     
 
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        //Initialize tableview background
+        tableView.backgroundColor = UIColor.init(red: 23/255, green: 61/255, blue: 80/255, alpha: 1)
+        headerView.backgroundColor = tableView.backgroundColor
+        footerView.backgroundColor = headerView.backgroundColor
+        headerImage.layer.cornerRadius = 15
+        headerImage.layer.borderWidth = 2.5
+        headerImage.layer.borderColor = .init(red: 0.8, green: 0.75, blue: 0.4, alpha: 0.95)
+        headerImage.layer.shadowRadius = 20
+        
+        
+        //Set stepper appearance
+        stepperView.layer.backgroundColor = UIColor.lightGray.cgColor
+        stepperView.layer.cornerRadius = 10
+        
+        
+        
+        //Initialize description
+        headerDescription.backgroundColor = .clear
+        headerDescription.textColor = .white
 
-        // fetchDataFrom info
+        
+        
+        
+        
+        //Initialize price and options
+        sectionInitializer()
+        priceCalculate()
+        
+
+        //Initialize title image
         fetchAndSet(info: drinkInfo) { imageData, name, desc, price in
             self.headerImage.image = UIImage(data: imageData)
+            self.headerDescription.text = desc
         }
+        
+        
+        //Assign delegat
+        clientName.delegate = self
+        notes.delegate = self
+
+    }
+    
+    
+    
+    
+    //Alert function
+    func showAlert(with message:String){
+        
+        let alertController = UIAlertController(title: "Missing Selection", message: message, preferredStyle: .alert)
+        let alertAction = UIAlertAction(title: "Got it", style: .default)
+        alertController.addAction(alertAction)
+        present(alertController, animated: true)
+    }
+    
+    
+    
+    // MARK: - implement text field delegate function
+    func textFieldShouldReturn(_ textField: UITextField) -> Bool {
+        textField.resignFirstResponder()
+        return true
     }
     
     
 
-    
-    
-    
-    
-    
-    
-    
-    
     
     
     
     // MARK: - Add to cart
     
+    @IBAction func stepperForCup(_ sender: UIStepper) {
+        orderInfo.cups = Int(sender.value)
+        priceCalculate()
+    }
+    
+    
     @IBAction func addToCart(_ sender: Any) {
-        postRequest()
         
+        // Check if the selections have been made
+        if sections[0].selectedRowIndex == nil {
+            showAlert(with: "Please select a 甜度 option.")
+            return
+            
+        }
+        if sections[1].selectedRowIndex == nil {
+            showAlert(with: "Please select an 冰塊 option.")
+            return
+            
+        }
+        if sections[2].selectedRowIndex == nil {
+            showAlert(with: "Please select a 配料 option.")
+            return
+            
+        }
+        if sections[3].selectedRowIndex == nil{
+            showAlert(with: "Please select a size option")
+        }
+        
+        
+
+        postRequest()
         
     }
     
  
-    
-    
-    
+
     func priceCalculate(){
-        
-        if orderInfo.sizeDescription == "medium"{
+        if orderInfo.size == "medium"{
             orderInfo.price = drinkInfo?.fields.medium ?? 10
-        }else{
-            orderInfo.price = drinkInfo?.fields.big ?? 10
-        }
+            originPrice = orderInfo.price
             
+        }else if orderInfo.size == "big"{
+            orderInfo.price = drinkInfo?.fields.big ?? 10
+            originPrice = orderInfo.price
+            
+        }else{
+            orderInfo.price = 0
+            originPrice = 0
+        }
+        
+        orderInfo.price *= orderInfo.cups
+        addToCart.setTitle("Add \(orderInfo.cups) cups $ \(orderInfo.price) to cart", for: .normal)
     }
     
     
     
-    
+
     //Post request
     func postRequest(){
         
@@ -106,15 +202,24 @@ class DetailTableViewController: UITableViewController {
             //Extract and post drink info
             guard let drinkInfo else{ return }
             
+            
+            let inputName = (clientName.text == "" ? "Defualt client":clientName.text)!
+            let inputNote = (notes.text == "" ? "None" : notes.text)!
+     
+            
+            
             let orderFields = PostFields(
                 orderedDrinkName: drinkInfo.fields.name,
                 sweetness: orderInfo.sweetness,
                 ice: orderInfo.ice,
-                clientName: clientName.text ?? "Defualt client 404",
-                notes: notes.text ?? "none",
+                clientName: inputName,
+                notes: inputNote,
                 toppings: orderInfo.toppings,
                 price: orderInfo.price,
-                size: orderInfo.size
+                originPrice: self.originPrice,
+                size: orderInfo.size,
+                cups: orderInfo.cups,
+                menuID: drinkInfo.id
             )
             
             
@@ -192,13 +297,6 @@ class DetailTableViewController: UITableViewController {
         }
         
 
-    
-        guard let drinkInfo else{
-            print("drinkInfo found nil")
-            return cell
-        }
-
-
         
         
         cellConfig(cell, indexPath)
@@ -214,7 +312,6 @@ class DetailTableViewController: UITableViewController {
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
             
-
             sections[indexPath.section].selectedRowIndex = indexPath.row
                 
                 //Extract order info
@@ -225,26 +322,23 @@ class DetailTableViewController: UITableViewController {
                     print(orderInfo.ice)
                 case 2: orderInfo.toppings = sections[2].rows[indexPath.row]
                     print(orderInfo.toppings)
-                case 3: orderInfo.sizeDescription = sections[3].rows[indexPath.row]
-                    print(orderInfo.size)
-                    
+                case 3:
+                
+                print(sections[3].rows[indexPath.row])
+                switch indexPath.row {
+                case 0: orderInfo.size = "medium"
+                case 1: orderInfo.size = "big"
+                default : orderInfo.size = "medium"
+                }
+                
                 default: return
             }
                 
                 
             //Calculate when tapped
             priceCalculate()
+        
             tableView.reloadData()
-                // Get all rows within the section to be reloaded
-                /*
-                let rowsInRange = 0..<sections[indexPath.section].rows.count
-                let indexPathsToReload = rowsInRange.map { IndexPath(row: $0, section: indexPath.section) }
-                
-                // Reload the rows without affecting the header
-                UIView.performWithoutAnimation {
-                    tableView.reloadRows(at: indexPathsToReload, with: .none)
-                }
-                */
 
         }
     
@@ -321,6 +415,9 @@ class DetailTableViewController: UITableViewController {
 
     
     
+    
+    
+    
     // MARK: - Objc func
     
     @objc func handleSectionHeaderTap(gesture: UITapGestureRecognizer) {
@@ -344,6 +441,9 @@ class DetailTableViewController: UITableViewController {
 
         tableView.endUpdates()
     }
+
+    
+
 
     
 

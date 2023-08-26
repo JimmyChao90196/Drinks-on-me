@@ -20,7 +20,8 @@
 		74C742992A8B61EF00467381 /* MenuTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 74C742982A8B61EF00467381 /* MenuTableViewController.swift */; };
 		74DF44DE2A8F1D850037B3BA /* CartTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 74DF44DD2A8F1D850037B3BA /* CartTableViewCell.swift */; };
 		74DF44E02A8F1DC60037B3BA /* CartViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 74DF44DF2A8F1DC60037B3BA /* CartViewController.swift */; };
-		74FF8FAE2A8CC3020044F05F /* FetchAndSet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 74FF8FAD2A8CC3020044F05F /* FetchAndSet.swift */; };
+		74EED19F2A907B62008A765B /* BadgeModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 74EED19E2A907B62008A765B /* BadgeModel.swift */; };
+		74FF8FAE2A8CC3020044F05F /* FetchFunctions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 74FF8FAD2A8CC3020044F05F /* FetchFunctions.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -39,7 +40,8 @@
 		74C742982A8B61EF00467381 /* MenuTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuTableViewController.swift; sourceTree = "<group>"; };
 		74DF44DD2A8F1D850037B3BA /* CartTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CartTableViewCell.swift; sourceTree = "<group>"; };
 		74DF44DF2A8F1DC60037B3BA /* CartViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CartViewController.swift; sourceTree = "<group>"; };
-		74FF8FAD2A8CC3020044F05F /* FetchAndSet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FetchAndSet.swift; sourceTree = "<group>"; };
+		74EED19E2A907B62008A765B /* BadgeModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BadgeModel.swift; sourceTree = "<group>"; };
+		74FF8FAD2A8CC3020044F05F /* FetchFunctions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FetchFunctions.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -56,9 +58,10 @@
 		742970AF2A8C6FBF00A737D6 /* Model */ = {
 			isa = PBXGroup;
 			children = (
-				74FF8FAD2A8CC3020044F05F /* FetchAndSet.swift */,
+				74FF8FAD2A8CC3020044F05F /* FetchFunctions.swift */,
 				742970AD2A8C6FB800A737D6 /* MenuModel.swift */,
 				74AFF9BC2A8E0D2F004A2981 /* OrderModel.swift */,
+				74EED19E2A907B62008A765B /* BadgeModel.swift */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -205,10 +208,11 @@
 				74AFF9BD2A8E0D2F004A2981 /* OrderModel.swift in Sources */,
 				74914B5E2A8DF25500CF520F /* DetailTableViewController.swift in Sources */,
 				74C742842A8B619B00467381 /* AppDelegate.swift in Sources */,
+				74EED19F2A907B62008A765B /* BadgeModel.swift in Sources */,
 				74AFF9BB2A8DF91B004A2981 /* DetailTableViewCell.swift in Sources */,
 				74C742862A8B619B00467381 /* SceneDelegate.swift in Sources */,
 				742970AE2A8C6FB800A737D6 /* MenuModel.swift in Sources */,
-				74FF8FAE2A8CC3020044F05F /* FetchAndSet.swift in Sources */,
+				74FF8FAE2A8CC3020044F05F /* FetchFunctions.swift in Sources */,
 				74DF44E02A8F1DC60037B3BA /* CartViewController.swift in Sources */,
 				74DF44DE2A8F1D850037B3BA /* CartTableViewCell.swift in Sources */,
 				742970AC2A8C6E7900A737D6 /* MenuTableViewCell.swift in Sources */,

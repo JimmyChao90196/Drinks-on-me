@@ -13,11 +13,14 @@ class DetailTableViewCell: UITableViewCell {
     
     // MARK: - Prepare for reuse
 
+    override func prepareForReuse() {
+        
+    }
+    
     
     override func awakeFromNib() {
         super.awakeFromNib()
         
-
         // Initialization code
         self.textLabel?.text = nil
         self.imageView?.image = nil
